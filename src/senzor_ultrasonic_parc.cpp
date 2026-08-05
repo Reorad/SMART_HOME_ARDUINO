@@ -12,8 +12,8 @@ int Led_State = LED_OFF;
 
 void setup_Hardware() {
   Serial.begin(9600);
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  pinMode(LED_PIN_ULTRASONIC, OUTPUT);
+  digitalWrite(LED_PIN_ULTRASONIC, LOW);
 }
 
 void Run_Ultrasonic() {
@@ -25,7 +25,7 @@ void Run_Ultrasonic() {
       Serial.println("cm");
 
       if(dist > 0 && dist <= 10 ) {
-        digitalWrite(LED_PIN, HIGH);
+        digitalWrite(LED_PIN_ULTRASONIC, HIGH);
         Led_State = LED_ON;
         LED_TIMER = current_time;
       }
@@ -36,6 +36,6 @@ void Timer_Led() {
     unsigned long current_time = millis(); 
     if(Led_State == LED_ON && current_time - LED_TIMER >= LED_ON_TIMER) {
       Led_State = LED_OFF;
-      digitalWrite(LED_PIN, LOW);
+      digitalWrite(LED_PIN_ULTRASONIC, LOW);
     }
 }
