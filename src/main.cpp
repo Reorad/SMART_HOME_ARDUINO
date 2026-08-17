@@ -1,23 +1,34 @@
 #include <Arduino.h>
-#include <NewPing.h>
+#include "pini.h"
 #include "senzor_ultrasonic_parc.h"
-
-// PINS USED FOR ULTRASONIC SENSOR :
-// #define Trig_PIN 6
-// #define Echo_PIN 7 
-// #define LED_PIN_ULTRASONIC 2
-
-
+#include "proxi_alerta.h"
 
 
 void setup() {
   Serial.begin(9600);
-  pinMode(LED_PIN_ULTRASONIC, OUTPUT);
-  digitalWrite(LED_PIN_ULTRASONIC , LOW);
+  
+  pinMode(LED_Proxy_PIN, OUTPUT);
+  digitalWrite(LED_Proxy_PIN, LOW);
+
+  ultrasonic_init();
+  alerta_init();
+
+  Serial.println("Start_ultrasonic sensor");
+
 }
 
 
 void loop() {
-  Run_Ultrasonic();
-  Timer_Led();
+    const unsigned long current_time = millis();
+    ultrasonic_update(current_time);
+    alerta_update(current_time, ultrasonic_distance_cm());
+
+    if(alerta_activata()){
+      digitalWrite(LED_Proxy_PIN, HIGH);
+    }
+    else{
+      digitalWrite(LED_Proxy_PIN, LOW);
+    }
+      
+    
 }

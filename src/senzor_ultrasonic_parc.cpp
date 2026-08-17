@@ -1,41 +1,25 @@
 #include "senzor_ultrasonic_parc.h"
+#include "pini.h"
+#include <NewPing.h>
 
-// Obiectul și variabilele private stau doar aici
-NewPing sonar(Trig_PIN, Echo_PIN, max_distance);
+static NewPing sonar(Trig_PIN, Echo_PIN, DISTANTA_MAX_cm);
 
-unsigned long last_time_ultra_senzor = 0;
-unsigned long LED_TIMER = 0;
+static unsigned long ultima_citire = 0;
+static unsigned int ultima_distanta = 0;
 
-#define LED_ON 1
-#define LED_OFF 0
-int Led_State = LED_OFF;
 
-void setup_Hardware() {
-  Serial.begin(9600);
-  pinMode(LED_PIN_ULTRASONIC, OUTPUT);
-  digitalWrite(LED_PIN_ULTRASONIC, LOW);
+void ultrasonic_init() {
+  ultima_citire = 0;
+  ultima_distanta = 0;
 }
 
-void Run_Ultrasonic() {
-    unsigned long current_time = millis(); 
-    if(current_time - last_time_ultra_senzor >= TIME_Ultrasonic) { 
-      last_time_ultra_senzor = current_time;
-      unsigned int dist = sonar.ping_cm();
-      Serial.print(dist);
-      Serial.println("cm");
-
-      if(dist > 0 && dist <= 10 ) {
-        digitalWrite(LED_PIN_ULTRASONIC, HIGH);
-        Led_State = LED_ON;
-        LED_TIMER = current_time;
-      }
-    }
+void ultrasonic_update(unsigned long time) {
+  if (time - ultima_citire >= Interval_Ultrasonic) {
+    ultima_citire = time;
+    ultima_distanta = sonar.ping_cm();
+  }
 }
 
-void Timer_Led() {
-    unsigned long current_time = millis(); 
-    if(Led_State == LED_ON && current_time - LED_TIMER >= LED_ON_TIMER) {
-      Led_State = LED_OFF;
-      digitalWrite(LED_PIN_ULTRASONIC, LOW);
-    }
+unsigned int ultrasonic_distance_cm() {
+  return ultima_distanta;
 }
